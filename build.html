@@ -173,7 +173,7 @@ Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in 
 
 2. `microgreens` (Microgreen Guide)
 - `id`: string
-- `name`: string                  // unique per user
+- `name`: string                  // unique per user (enforce in UI by checking for existing name before save)
 - `soaking_required`: boolean
 - `germination_days`: number
 - `days_to_harvest`: number
@@ -195,7 +195,7 @@ Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in 
 
 4. `inventory_items`
 - `id`: string
-- `name`: string                  // unique per user
+- `name`: string                  // unique per user (enforce in UI by checking for existing name before save)
 - `unit`: string                  // e.g. "g", "kg", "bottle", "pouch"
 - `cost_per_unit`: number
 - `quantity_on_hand`: number
@@ -213,11 +213,14 @@ Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in 
 
 6. `products`
 - `id`: string
-- `name`: string                  // unique per user
+- `name`: string                  // unique per user (enforce in UI by checking for existing name before save)
 - `unit`: string                  // e.g. "bottle","pouch"
 - `sale_price_per_unit`: number
 - `shelf_life_days`: number | null
 - `notes`: string | null
+- `microgreen`: link to `microgreens`     // required; 1 product → 1 microgreen
+- `dried_needed_g_per_unit`: number       // required
+- `fresh_needed_g_per_unit`: number | null // optional override
 - `created_at`: date
 
 7. `bom_lines` (Bill of Materials lines)
@@ -225,7 +228,7 @@ Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in 
 - `product`: link to `products`
 - `inventory_item`: link to `inventory_items`
 - `qty_per_unit`: number
-- `unit_label`: string
+- `unit_label`: string            // must match inventory_items.unit exactly
 
 8. `production_cycles`
 - `id`: string
@@ -244,6 +247,8 @@ Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in 
 - `id`: string
 - `production_cycle`: link to `production_cycles`
 - `microgreen`: link to `microgreens`
+- `source_product`: link to `products`  // trace back to product demand
+- `fresh_required_g`: number            // fresh grams this line is planning to supply
 - `run_number`: number
 - `trays_this_run`: number
 - `soak_date`: date | null
@@ -335,19 +340,31 @@ Use the Next.js App Router. Create at least the following routes.
   - A form to create `inventory_adjustments`:
     - Choose inventory item.
     - Select `adjustment_type` ("purchase","usage","cycle_count","correction").
-    - Enter `quantity_delta`.
+    - If `adjustment_type` is `"cycle_count"`:
+      - Show a "Counted quantity" field (absolute count).
+      - Compute `quantity_delta = counted - current_on_hand`.
+      - Save that delta and update `quantity_on_hand` and `last_count_date`.
+    - For other types, let the user enter `quantity_delta` directly (positive for increases, negative for decreases as appropriate).
     - Optional note.
-  - When an adjustment is created, update `quantity_on_hand` accordingly and set `last_count_date` for cycle counts.
   - Show a history table of recent adjustments with type, quantity_delta, note, and date.
 
 7. `/products`
 - Products CRUD + BOM editor.
 - Features:
-  - Create and edit `products`.
+  - Create and edit `products` with:
+    - Linked `microgreen` (required dropdown).
+    - `dried_needed_g_per_unit` (required).
+    - `fresh_needed_g_per_unit` (optional).
   - For each product, show its BOM lines and allow:
     - Adding BOM lines by selecting `inventory_items`.
     - Editing `qty_per_unit` and `unit_label`.
     - Removing BOM lines.
+- **Unit matching rule (v1):**
+  - When creating/editing a BOM line, `unit_label` must exactly match the selected `inventory_item.unit`.
+  - If they do not match, show an inline error like:
+    - "Unit must match the inventory item's unit exactly (expected 'g')."
+  - Do not save that BOM line until the units match.
+  - Do **not** implement any automatic unit conversions in v1.
 
 8. `/cycles`
 - List and create production cycles.
@@ -361,7 +378,7 @@ Use the Next.js App Router. Create at least the following routes.
 
 9. `/cycles/[id]/plan`
 - Planner page for a single production cycle.
-- Inputs (from linked `production_targets` and calibration, BOM, and microgreens).
+- Inputs (from linked `production_targets` and calibration, BOM, products, and microgreens).
 - Outputs should include:
   - Freeze dryer feasibility.
   - Resource feasibility (inventory shortages).
