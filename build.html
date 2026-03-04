@@ -145,73 +145,121 @@ export const db = init({
 ```
 
 ## App Description
-Build an app called **KCG Ventures ERP**. It is a focused production planning and inventory management system for a shared production facility. The app replaces complex Google Sheets with a structured web application that models freeze-dryer capacity, yield logging, batch planning based on target dried ingredient amounts, and inventory ledgers with append-only transactions. All key operational variables are configurable through the UI (no hard-coded calibration assumptions).
+Build an app called **KCG Ventures ERP** for the shared BotanIQals + MiniLeaf facility. It is a production planning, inventory, and costing ERP that replaces complex Google Sheets workflows. The app should:
+- Plan production cycles and tray schedules.
+- Check freeze-dryer capacity feasibility.
+- Track microgreen yields and inventory with cycle counts.
+- Manage products and Bills of Materials (BOMs).
+- Project material costs, revenue, and gross profit for each cycle.
+
+Customer/POS flows (orders, invoicing, payments, shipping) and full accounting are out of scope.
 
 ## Data Model
-Create an InstantDB schema in `instant.schema.ts` with these entities and fields:
+Create an InstantDB schema in `instant.schema.ts` with these entities and fields.
 
-1. `calibration` (a single global calibration profile for now)
-- `id`: string (InstantDB id)
+Where fields are `date` / ISO strings, you can use JavaScript `Date` objects in the UI and store them as strings in InstantDB.
+
+1. `calibration` (single profile per user for v1)
+- `id`: string
 - `number_of_freeze_dryers`: number
 - `trays_per_machine_per_cycle`: number
-- `cycle_time_hours`: number               // active freeze-drying time per cycle
-- `defrost_cleaning_hours`: number         // defrost / cleaning time per cycle
+- `cycle_time_hours`: number
+- `defrost_cleaning_hours`: number
 - `operating_hours_per_day`: number
 - `operating_days_per_week`: number
-- `fresh_load_per_tray_g`: number          // grams of fresh material per tray
-- `dry_matter_fraction`: number            // fraction of dry matter in fresh material (0-1)
-- `owner_id`: string (user id reference, optional – used to scope per user)
-
-2. `yield_entries`
-- `id`: string
-- `microgreen_type`: string
-- `tray_harvest_date`: date
-- `fresh_harvested_weight_g`: number
-- `dried_output_weight_g`: number | null
-- `tray_identifier`: string | null
+- `fresh_load_per_tray_g`: number
+- `dry_matter_fraction`: number
 - `created_at`: date
 
-3. `batches`
+2. `microgreens` (Microgreen Guide)
 - `id`: string
-- `production_start_date`: date
-- `production_end_date`: date
-- `target_ingredient`: string         // e.g. "broccoli powder"
-- `target_dried_weight_g`: number
-- `status`: string                    // e.g. "planned", "draft"
+- `name`: string                  // unique per user
+- `soaking_required`: boolean
+- `germination_days`: number
+- `days_to_harvest`: number
+- `sow_rate_g_per_tray`: number
+- `notes`: string | null
+- `default_soak_offset_days`: number | null
+- `light_offset_days`: number | null
+- `harvest_offset_days`: number | null
+- `created_at`: date
+
+3. `yield_entries`
+- `id`: string
+- `microgreen`: link to `microgreens`
+- `harvest_date`: date
+- `fresh_yield_g`: number
+- `dried_yield_g`: number | null
+- `tray_identifier`: string | null
 - `created_at`: date
 
 4. `inventory_items`
 - `id`: string
-- `name`: string                      // e.g. "Broccoli floret", "Pouch 250g"
-- `unit`: string                      // e.g. "g", "kg", "units"
-- `quantity_on_hand`: number         // derived from transactions but kept for fast display
+- `name`: string                  // unique per user
+- `unit`: string                  // e.g. "g", "kg", "bottle", "pouch"
+- `cost_per_unit`: number
+- `quantity_on_hand`: number
+- `par_level`: number | null
+- `last_count_date`: date | null
 - `created_at`: date
 
-5. `inventory_transactions`
+5. `inventory_adjustments`
 - `id`: string
-- `type`: string                      // "purchase", "consumption", "adjustment"
-- `quantity`: number
-- `reference`: string | null          // optional free-text note
+- `inventory_item`: link to `inventory_items`
+- `adjustment_type`: string       // "purchase","usage","cycle_count","correction"
+- `quantity_delta`: number
+- `note`: string | null
 - `created_at`: date
 
-6. `finished_goods_batches`
+6. `products`
 - `id`: string
-- `product_name`: string
-- `quantity_produced`: number
-- `date_produced`: date
-- `expiration_date`: date | null
+- `name`: string                  // unique per user
+- `unit`: string                  // e.g. "bottle","pouch"
+- `sale_price_per_unit`: number
+- `shelf_life_days`: number | null
+- `notes`: string | null
 - `created_at`: date
+
+7. `bom_lines` (Bill of Materials lines)
+- `id`: string
+- `product`: link to `products`
+- `inventory_item`: link to `inventory_items`
+- `qty_per_unit`: number
+- `unit_label`: string
+
+8. `production_cycles`
+- `id`: string
+- `start_date`: date
+- `end_date`: date
+- `status`: string                // "draft","planned","completed"
+- `created_at`: date
+
+9. `production_targets`
+- `id`: string
+- `production_cycle`: link to `production_cycles`
+- `product`: link to `products`
+- `target_units`: number
+
+10. `production_plan_lines`
+- `id`: string
+- `production_cycle`: link to `production_cycles`
+- `microgreen`: link to `microgreens`
+- `run_number`: number
+- `trays_this_run`: number
+- `soak_date`: date | null
+- `sow_date`: date
+- `light_date`: date
+- `harvest_date`: date
 
 Relationships:
 - Link all user-owned entities to the built-in `$users` table:
-  - Each `calibration` has one `owner` (a `$users` record).
+  - Each `calibration` belongs to one user.
+  - Each `microgreens` record belongs to one user.
   - Each `yield_entries` record belongs to one user.
-  - Each `batches` record belongs to one user.
-  - Each `inventory_items` record belongs to one user.
-  - Each `inventory_transactions` record belongs to one user and one `inventory_items` record.
-  - Each `finished_goods_batches` record belongs to one user.
-
-Model these relations using InstantDB links (for example using `links` with forward/reverse definitions).
+  - Each `inventory_items` and `inventory_adjustments` record belongs to one user.
+  - Each `products` and `bom_lines` record belongs to one user.
+  - Each `production_cycles`, `production_targets`, and `production_plan_lines` record belongs to one user.
+- Implement these with InstantDB `links` (forward and reverse definitions) so it is easy to query user-scoped data.
 
 ## Authentication
 Implement user authentication using InstantDB's Magic Code flow:
@@ -226,18 +274,20 @@ When a user is not logged in:
 - Show a simple, friendly message explaining that they need to log in to use the ERP.
 
 ## Pages to Create
-Use the Next.js App Router. Create at least the following routes:
+Use the Next.js App Router. Create at least the following routes.
 
 1. `/` (Home / Dashboard)
 - If the user is not authenticated, show a welcome message and a clear call-to-action button to "Log in" that links to `/login`.
-- If the user is authenticated, show a simple dashboard with:
-  - A quick summary of their calibration status (e.g. whether a calibration record exists).
-  - Shortcuts (cards or buttons) linking to:
+- If the user is authenticated, show:
+  - A summary of the current or most recent production cycle.
+  - High-level feasibility status (e.g. "Feasible / Shortages").
+  - Key shortcuts (cards or buttons) to:
     - Calibration
-    - Yield Logging
-    - Batch Planner
+    - Microgreen Guide
+    - Products + BOM
     - Inventory
-    - Finished Goods
+    - Yield Logging
+    - Production Cycles / Planner
 
 2. `/login`
 - Implement the Magic Code login UX with:
@@ -247,59 +297,88 @@ Use the Next.js App Router. Create at least the following routes:
 - Once logged in, redirect to `/`.
 
 3. `/calibration`
-- A page where the user can view and edit their single calibration profile.
-- If no calibration exists yet for this user, show an "empty state" with a button to create one using sensible defaults.
-- The form fields should match the `calibration` entity:
-  - number_of_freeze_dryers
-  - trays_per_machine_per_cycle
-  - cycle_time_hours
-  - defrost_cleaning_hours
-  - operating_hours_per_day
-  - operating_days_per_week
-  - fresh_load_per_tray_g
-  - dry_matter_fraction
-- On the same page, display derived read-only values calculated from the inputs:
+- Page to view and edit the single calibration profile for the logged-in user.
+- If no calibration exists yet, show an "empty state" with a button to create one with sensible defaults.
+- Form fields match the `calibration` entity.
+- Show derived read-only metrics:
   - `hours_per_cycle = cycle_time_hours + defrost_cleaning_hours`
   - `per_cycle_fresh_capacity = number_of_freeze_dryers * trays_per_machine_per_cycle * fresh_load_per_tray_g`
-  - Given a production window with `production_days`, you will later use:
-    - `total_available_hours = production_days * operating_hours_per_day`
-    - `max_cycles_available = floor(total_available_hours / hours_per_cycle)`
-- It's okay if `production_days` is not used directly here; just show the first two derived values based on the calibration inputs.
 
-4. `/yield`
-- A page for logging tray-level yield data and viewing recent history.
+4. `/microgreens`
+- CRUD page for the Microgreen Guide.
+- Let the user:
+  - Create new microgreens.
+  - Edit existing microgreens.
+  - See a table of all microgreens with their key parameters.
+
+5. `/yield`
+- Yield logging and analysis page.
+- UX requirements:
+  - Provide a "Create new microgreen" action that opens a quick-create flow and then selects it.
+  - Provide a "Choose existing microgreen" dropdown or search to select from `microgreens`.
+- Form fields:
+  - microgreen
+  - harvest_date
+  - fresh_yield_g
+  - dried_yield_g (optional)
+  - tray_identifier (optional)
+- Outputs:
+  - Recent entries list (e.g. last 20).
+  - Rolling averages per microgreen:
+    - Average fresh yield per tray.
+    - Average dried yield per tray (for entries with a dried value).
+
+6. `/inventory`
+- Inventory ledger + cycle count page.
 - Features:
-  - A form to create a new `yield_entries` record with:
-    - microgreen_type
-    - tray_harvest_date
-    - fresh_harvested_weight_g
-    - dried_output_weight_g (optional)
-    - tray_identifier (optional)
-  - A table or list of recent entries (e.g. last 20), sorted by `tray_harvest_date` descending.
-  - Calculated rolling averages displayed at the top:
-    - Average fresh yield per tray (mean of `fresh_harvested_weight_g`).
-    - Average dried yield per tray (mean of `dried_output_weight_g` for entries where it is not null).
+  - CRUD for `inventory_items` (name, unit, cost_per_unit, quantity_on_hand, par_level).
+  - A form to create `inventory_adjustments`:
+    - Choose inventory item.
+    - Select `adjustment_type` ("purchase","usage","cycle_count","correction").
+    - Enter `quantity_delta`.
+    - Optional note.
+  - When an adjustment is created, update `quantity_on_hand` accordingly and set `last_count_date` for cycle counts.
+  - Show a history table of recent adjustments with type, quantity_delta, note, and date.
 
-5. `/planner`
-- A batch planner that starts from a target dried ingredient amount and tests freeze-dryer feasibility.
-- Inputs in a form:
-  - production_start_date
-  - production_end_date
-  - target_ingredient (string)
-  - target_dried_weight_g (number)
-- Use the calibration record and formulas below to calculate feasibility.
+7. `/products`
+- Products CRUD + BOM editor.
+- Features:
+  - Create and edit `products`.
+  - For each product, show its BOM lines and allow:
+    - Adding BOM lines by selecting `inventory_items`.
+    - Editing `qty_per_unit` and `unit_label`.
+    - Removing BOM lines.
+
+8. `/cycles`
+- List and create production cycles.
+- For each cycle, store:
+  - start_date, end_date, status.
+  - Linked `production_targets` (product + target_units).
+- The index page should:
+  - List existing cycles.
+  - Provide a "Create cycle" form.
+  - Link to a details/planner view at `/cycles/[id]/plan`.
+
+9. `/cycles/[id]/plan`
+- Planner page for a single production cycle.
+- Inputs (from linked `production_targets` and calibration, BOM, and microgreens).
+- Outputs should include:
+  - Freeze dryer feasibility.
+  - Resource feasibility (inventory shortages).
+  - Cost, revenue, and gross profit.
+  - Generated tray plan lines.
 
 ### Freeze Dryer Feasibility Model (Important)
 
-Use these formulas exactly, based on the production idea document:
+Use this model based on the idea/architecture docs:
 
-1. Compute the inclusive number of production days:
+1. Inclusive production window:
 ```ts
-const production_days = (endDate - startDate) + 1;
+const production_days = Math.floor((end - start) / msPerDay) + 1;
 ```
-Where `startDate` and `endDate` are dates (you can compute this using JavaScript date math and dividing the difference in milliseconds by the length of a day). Days are inclusive, so if start and end are the same day, `production_days` should be 1.
+Where `start` and `end` are dates and `msPerDay` is the number of milliseconds in a day.
 
-2. Derived from calibration:
+2. From calibration:
 ```ts
 const hours_per_cycle = cycle_time_hours + defrost_cleaning_hours;
 
@@ -313,121 +392,159 @@ const total_available_hours = production_days * operating_hours_per_day;
 const max_cycles_available = Math.floor(total_available_hours / hours_per_cycle);
 ```
 
-3. Use yield assumptions to go from target dried to required fresh:
-- The `dry_matter_fraction` is the fraction of dry matter in the fresh load.
-- Given a target dried weight (`target_dried_weight_g`), approximate the fresh weight needed as:
+3. Convert target dried requirement → fresh requirement:
 ```ts
-const fresh_needed_g = target_dried_weight_g / dry_matter_fraction;
+const fresh_needed_g = dried_needed_g / dry_matter_fraction;
 ```
 
-4. Convert fresh needed into required freeze-dryer cycles:
+4. Compute cycles needed:
 ```ts
 const cycles_needed = fresh_needed_g / per_cycle_fresh_capacity;
 ```
 
-5. Feasibility condition:
-- The batch is feasible from a freeze-dryer perspective if:
+5. Feasibility check:
 ```ts
 const feasible = max_cycles_available >= Math.ceil(cycles_needed);
 ```
 
-On the `/planner` page, display:
-- Trays required (you can approximate by `cycles_needed * trays_per_machine_per_cycle`, rounded up).
-- Cycles required (`Math.ceil(cycles_needed)`).
-- Total hours required (`Math.ceil(cycles_needed) * hours_per_cycle`).
+Display for the user:
+- Required cycles (`Math.ceil(cycles_needed)`).
 - Available cycles (`max_cycles_available`).
-- A clear status:
-  - If feasible: show a success message.
-  - If not feasible: show how many cycles, hours, or fresh capacity you are short by.
+- Approximate trays required (e.g. `Math.ceil(cycles_needed * trays_per_machine_per_cycle)`).
+- Total hours required (`Math.ceil(cycles_needed) * hours_per_cycle`).
+- A clear feasible / not-feasible status.
 
-6. Optional (if scope allows): inventory sufficiency check
-- For now, you can implement a simple check where the user manually enters the amount of a key inventory item required, and compare it to `quantity_on_hand` for that item:
+### Resource Feasibility (Inventory Sufficiency)
+
+For each production cycle:
+1. For each `production_targets` record (product + target_units), and for each `bom_lines` row for that product:
 ```ts
-const sufficient = required_quantity &lt;= quantity_on_hand;
+const required_qty = target_units * qty_per_unit;
 ```
-- This can be presented on the planner page as a second “gate” after freeze-dryer capacity.
 
-6. `/inventory`
-- A page that acts as a simple inventory ledger.
-- Features:
-  - List all `inventory_items` with `name`, `unit`, and `quantity_on_hand`.
-  - A form to create new `inventory_items`.
-  - A section to record new `inventory_transactions`:
-    - Choose an `inventory_item`.
-    - Select `type` ("purchase", "consumption", "adjustment").
-    - Enter `quantity`.
-    - Optional `reference` note.
-  - When a transaction is created, also update the `quantity_on_hand` for that item in a consistent way:
-    - "purchase": add the quantity.
-    - "consumption": subtract the quantity.
-    - "adjustment": add the quantity (it can be negative for corrections).
-  - Show a history list of recent transactions, sorted by `created_at` descending.
+2. For each inventory item, aggregate required quantity across all products:
+```ts
+const total_required_for_item = sum(required_qty_for_that_item_across_targets);
+```
 
-7. `/finished-goods`
-- A simple page to log finished goods batches.
-- Features:
-  - A form to create a `finished_goods_batches` record with:
-    - product_name
-    - quantity_produced
-    - date_produced
-    - expiration_date (optional, can be derived using simple rules if you want)
-  - A list or table of finished goods batches.
+3. Compare to `quantity_on_hand`:
+```ts
+const shortage = Math.max(0, total_required_for_item - quantity_on_hand);
+```
 
-All of the above pages (except `/login`) must be protected so only authenticated users can access them.
+4. Output a shortages table:
+- item name
+- required
+- on_hand
+- shortage
+- unit
+
+### Cost, Revenue, and Gross Profit
+
+Per production cycle:
+```ts
+const material_cost = sum_over_items(total_required_for_item * cost_per_unit);
+const revenue = sum_over_products(target_units * sale_price_per_unit);
+const gross_profit = revenue - material_cost;
+```
+
+Display both totals and per-product breakdowns.
+
+### Tray Plan Generation (High-Level)
+
+Based on:
+- Microgreen parameters (soaking_required, germination_days, days_to_harvest, sow_rate_g_per_tray).
+- Yield averages from `yield_entries` (fallback to simple defaults if there is not enough data).
+- Cycle window.
+
+Generate `production_plan_lines` that specify:
+- Which microgreen each run uses.
+- Run number and trays_this_run.
+- Dates:
+  - `soak_date` (if soaking_required; typically 1 day before sow).
+  - `sow_date`.
+  - `light_date` (sow_date + germination_days).
+  - `harvest_date`.
+
+You do not need to implement email sending in this phase; just generate and store the plan lines.
+
+10. `/settings/notifications` (optional, UI only)
+- A simple settings page that *prepares* for email reminders in a future phase:
+  - A place to enter one or more recipient email addresses.
+  - A toggle to enable/disable reminders.
+- Do not implement actual email delivery or cron jobs; keep this as future configuration only.
+
+All of the above routes except `/login` must be protected so only authenticated users can access them.
 
 ## Core Features
-Please implement at least these core features:
+Please implement at least these core features for v1:
 1. User authentication with InstantDB Magic Code flow.
-2. A calibration page where the user can create and edit a single calibration record and see derived metrics (hours per cycle, per-cycle fresh capacity).
-3. A yield logging page that lets the user record tray-level yields and shows rolling averages.
-4. A batch planner that:
-   - Starts from target dried weight and production window.
-   - Uses calibration and `dry_matter_fraction` to estimate fresh needed.
-   - Computes required cycles, available cycles, and feasibility.
-5. An inventory ledger with items and append-only transactions that update `quantity_on_hand`.
-6. A simple finished goods logging page.
+2. Calibration page where the user can create/edit calibration and see derived metrics.
+3. Microgreens CRUD (Microgreen Guide).
+4. Inventory CRUD + inventory adjustments (including cycle count workflow that updates quantity_on_hand and last_count_date).
+5. Products CRUD + BOM editor.
+6. Yield logging with "create microgreen" vs "choose existing" UX and rolling averages per microgreen.
+7. Production cycles and targets, with:
+   - Freeze-dryer feasibility calculation.
+   - Resource sufficiency / shortages table.
+   - Cost, revenue, and gross profit projections.
+8. Tray plan line generation and display for each cycle.
 
 ## UI Requirements
 - Use Tailwind CSS classes to create a clean, modern, and mobile-responsive UI.
-- Implement clear navigation between pages (a shared layout or navigation bar).
+- Implement a shared layout with navigation links to all main modules.
 - Show loading states while data is being fetched with `db.useQuery`.
 - Show error states or messages when operations fail.
-- Use simple, descriptive labels that match the business language for KCG Ventures (e.g. "Freeze Dryer Calibration", "Batch Planner", "Yield Logging").
+- Use clear, business-aligned labels such as:
+  - "Freeze Dryer Calibration"
+  - "Microgreen Guide"
+  - "Yield Logging"
+  - "Inventory & Cycle Count"
+  - "Products & BOM"
+  - "Production Cycles & Planner"
 
 ## File Structure
 Use this structure:
 ```
 src/
   app/
-    layout.tsx          # Root layout with providers (InstantDB provider, global nav)
-    page.tsx            # Home / dashboard page
+    layout.tsx              # Root layout with providers and global nav
+    page.tsx                # Home / dashboard page
     login/
-      page.tsx          # Login page
+      page.tsx              # Login page
     calibration/
-      page.tsx          # Calibration page
+      page.tsx              # Calibration page
+    microgreens/
+      page.tsx              # Microgreen guide page
     yield/
-      page.tsx          # Yield logging page
-    planner/
-      page.tsx          # Batch planner page
+      page.tsx              # Yield logging page
+    products/
+      page.tsx              # Products CRUD + BOM editor
     inventory/
-      page.tsx          # Inventory ledger page
-    finished-goods/
-      page.tsx          # Finished goods page
+      page.tsx              # Inventory CRUD + adjustments
+    cycles/
+      page.tsx              # List/create production cycles
+      [id]/
+        plan/
+          page.tsx          # Planner view for a single cycle
+    settings/
+      notifications/
+        page.tsx            # Notification settings (UI only, no email sending)
   components/
-    Navigation.tsx      # Shared navigation/header component
-    AuthGuard.tsx       # Component to protect authenticated routes
+    Navigation.tsx          # Shared navigation/header component
+    AuthGuard.tsx           # Component to protect authenticated routes
     [other reusable components as needed]
   lib/
-    db.ts               # InstantDB initialization
+    db.ts                   # InstantDB initialization
 
-instant.schema.ts       # InstantDB schema (matching the data model above)
-instant.perms.ts        # InstantDB permissions (so users can only see their own data)
+instant.schema.ts           # InstantDB schema (matching the data model above)
+instant.perms.ts            # InstantDB permissions (so users can only see their own data)
 ```
 
 ## InstantDB Permissions
 In `instant.perms.ts`, configure permissions so that:
-- Users can only read and write records that belong to them (based on the links to `$users`).
-- Authentication and Magic Code login work as expected.
+- Only authenticated users can read/write data.
+- Users can only read and write records that belong to them (based on links to `$users`).
 - It is safe to use this app on the public internet without exposing other users' data.
 
 ## Getting Started Steps (for the developer – Cursor)
