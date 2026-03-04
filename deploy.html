@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deploy – KCG Ventures ERP Tutorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0f766e',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-slate-50">
+    <header class="site-nav">
+      <div class="site-nav-inner">
+        <div class="site-nav-title">KCG Ventures ERP Tutorial</div>
+        <nav class="site-nav-links">
+          <a href="index.html" class="site-nav-link">Introduction</a>
+          <a href="setup.html" class="site-nav-link">Setup</a>
+          <a href="build.html" class="site-nav-link">Build</a>
+          <a href="deploy.html" class="site-nav-link current">Deploy</a>
+          <a href="reference.html" class="site-nav-link">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="deploy-intro" class="page-section space-y-5">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Page 4 · Deployment
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+          Put KCG Ventures ERP on the internet
+        </h1>
+        <p class="text-lg text-slate-700">
+          Right now your app only runs on your computer. In this step you&apos;ll push your code to
+          GitHub and let Vercel deploy it to a live URL you can share with anyone.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="what-is-deployment" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">1. What deployment actually is</h2>
+        <p>
+          When you run <code>npm run dev</code>, your laptop spins up a temporary web server at
+          <code>http://localhost:3000</code>. The moment you close your terminal or shut your
+          laptop, that server disappears.
+        </p>
+        <p>
+          <span class="font-semibold">Deployment</span> means running your app on a
+          <span class="font-semibold">server that is always on</span>, connected to the internet,
+          with a stable URL.
+        </p>
+        <div class="callout">
+          <div class="callout-title">Mental model: moving from test kitchen to full restaurant</div>
+          <p>
+            Think of <code>localhost:3000</code> as a test kitchen in your garage – only you can eat
+            there, and only while you&apos;re home. Deployment is like
+            <span class="font-semibold">leasing a building</span> in a busy area (Vercel) where the
+            restaurant is open even when you&apos;re not there, and anyone with the address can walk
+            in.
+          </p>
+        </div>
+        <p>
+          Vercel is designed specifically for apps like yours. Once you connect it to your GitHub
+          repository:
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>It builds your app for production.</li>
+          <li>It deploys it to a live URL with HTTPS enabled.</li>
+          <li>It re-deploys automatically whenever you push new changes.</li>
+        </ul>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="push-to-github" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">2. Push your code to GitHub</h2>
+        <p>
+          Vercel reads your code from GitHub. So the first step is to get your local project into a
+          GitHub repository.
+        </p>
+
+        <h3 class="text-xl font-semibold">Create a new GitHub repository</h3>
+        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+          <li>Go to <a href="https://github.com" class="text-primary font-medium">github.com</a> and sign in.</li>
+          <li>Click the <span class="font-semibold">+</span> icon in the top-right corner.</li>
+          <li>Select <span class="font-semibold">New repository</span>.</li>
+          <li>
+            Choose a repository name, for example
+            <code>kcg-ventures-erp</code>.
+          </li>
+          <li>Set the visibility to <span class="font-semibold">Public</span>.</li>
+          <li>
+            <span class="font-semibold">Important:</span> do not add a README, .gitignore, or
+            license from this screen – Cursor may already have created these locally.
+          </li>
+          <li>Click <span class="font-semibold">Create repository</span>.</li>
+        </ol>
+
+        <div class="callout">
+          <div class="callout-title">Connect your local project to GitHub</div>
+          <p class="mb-2">
+            On the repository page you just created, GitHub shows a set of commands under “...or
+            push an existing repository from the command line.”
+          </p>
+          <p class="mb-1">
+            Instead of typing them manually, you can ask Cursor to guide you:
+          </p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>Copy the repository URL from GitHub (it ends in <code>.git</code>).</li>
+            <li>In Cursor, open the terminal for your project folder.</li>
+            <li>
+              Open the Composer and tell Cursor something like:
+              <span class="italic"
+                >&quot;Please help me push this project to GitHub. My repository URL is
+                https://github.com/USERNAME/REPO-NAME.git&quot;</span
+              >.
+            </li>
+            <li>
+              Let Cursor suggest and run the necessary <code>git</code> commands
+              (initializing the repo, committing, adding the remote, and pushing).
+            </li>
+          </ol>
+        </div>
+
+        <p class="mt-2">
+          When you refresh your GitHub repository page, you should see your full project tree:
+          <code>src</code>, <code>instant.schema.ts</code>, <code>instant.perms.ts</code>,
+          <code>package.json</code>, etc.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="vercel-deploy" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">3. Deploy your app on Vercel</h2>
+        <p>
+          Now you&apos;ll connect Vercel to your GitHub repo and configure the one environment
+          variable your app needs.
+        </p>
+
+        <h3 class="text-xl font-semibold">Connect the repository</h3>
+        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+          <li>Go to <a href="https://vercel.com" class="text-primary font-medium">vercel.com</a> and sign in.</li>
+          <li>From the dashboard, click <span class="font-semibold">Add New...</span>.</li>
+          <li>Select <span class="font-semibold">Project</span>.</li>
+          <li>
+            You&apos;ll see a list of your GitHub repositories. Find the one you just created for
+            KCG Ventures ERP and click <span class="font-semibold">Import</span>.
+          </li>
+        </ol>
+
+        <h3 class="text-xl font-semibold">Add your InstantDB App ID as an environment variable</h3>
+        <p>
+          Before you click Deploy, you need to tell Vercel which InstantDB app to connect to. You&apos;ll
+          do this using an environment variable.
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">What are environment variables?</div>
+          <p class="mb-2">
+            Environment variables are a way to pass configuration values (like keys, IDs, or URLs)
+            into your app <span class="font-semibold">without hard-coding them</span> into the
+            source files. They&apos;re especially useful when:
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>You have different values for development vs production.</li>
+            <li>You don&apos;t want to expose sensitive values in public code.</li>
+          </ul>
+          <p class="mt-1">
+            In this case, your InstantDB App ID is safe to share, but we still follow the pattern so
+            your project matches real-world best practices.
+          </p>
+        </div>
+
+        <ol class="list-decimal list-inside space-y-1 text-slate-700 mt-2">
+          <li>In the project import screen on Vercel, look for the section labeled <span class="font-semibold">Environment Variables</span>.</li>
+          <li>
+            Add a new variable with:
+            <ul class="list-disc list-inside ml-4 space-y-1">
+              <li><span class="font-semibold">Name:</span> <code>NEXT_PUBLIC_INSTANT_APP_ID</code></li>
+              <li><span class="font-semibold">Value:</span> your actual InstantDB App ID</li>
+            </ul>
+          </li>
+          <li>Click <span class="font-semibold">Add</span> or the equivalent button to save it.</li>
+          <li>Now click <span class="font-semibold">Deploy</span>.</li>
+        </ol>
+
+        <p class="mt-2">
+          Vercel will now build your app. This usually takes 1–3 minutes. You can watch the build
+          logs to see what&apos;s happening.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="live-app" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">4. Visit your live ERP</h2>
+        <p>
+          When the build finishes successfully, Vercel will show a success screen with a URL, such
+          as:
+        </p>
+        <pre class="code-block-light"><code class="language-bash">https://kcg-ventures-erp-yourname.vercel.app</code></pre>
+        <p class="mt-2">
+          This URL is your app&apos;s new permanent address. Anyone with the link can open it in
+          their browser, log in, and (subject to your permissions) use the system.
+        </p>
+
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>You can open it on your phone and test the mobile layout.</li>
+          <li>You can share it privately with collaborators or advisors.</li>
+          <li>
+            You can keep iterating on the app by editing the code locally and pushing new commits to
+            GitHub – Vercel will re-deploy automatically.
+          </li>
+        </ul>
+
+        <div class="callout callout-strong">
+          <div class="callout-title">Automatic updates via GitHub</div>
+          <p>
+            Any time you:
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1 mt-1">
+            <li>Make changes to the code in Cursor.</li>
+            <li>Commit those changes with Git.</li>
+            <li>Push them to the main branch on GitHub.</li>
+          </ul>
+          <p class="mt-1">
+            Vercel will notice the new commit, rebuild your app, and update the live URL, usually
+            within a couple of minutes. You don&apos;t have to log into servers or run deployment
+            scripts manually.
+          </p>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="deploy-troubleshooting" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">5. If deployment fails</h2>
+        <p>
+          Sometimes the first deployment doesn&apos;t work on the first try. That&apos;s normal. The
+          key is to <span class="font-semibold">look at the error message</span> and feed it to the
+          AI.
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+          <li>
+            In Vercel, open your project and click on the failed deployment (it will be red or show
+            an error icon).
+          </li>
+          <li>
+            Scroll through the <span class="font-semibold">build logs</span>. Look for the first
+            place where something turns red or shows “Error”.
+          </li>
+          <li>
+            Select the relevant error text and copy it. Focus on the core error, not the entire
+            log.
+          </li>
+          <li>
+            Go back to Cursor, open the Composer, and say something like:
+            <span class="italic"
+              >&quot;Vercel deployment failed. Here is the build log error. Please fix my project
+              so it can deploy successfully.&quot;</span
+            >
+          </li>
+          <li>Paste the error message after that sentence.</li>
+          <li>Let Cursor propose code or config changes, apply them, push to GitHub, and try deploying again.</li>
+        </ol>
+
+        <p>
+          Over time, you&apos;ll start to recognize some of the common issues (missing environment
+          variable, small TypeScript mismatch, etc.), but you don&apos;t have to start there.
+        </p>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="scripts.js"></script>
+  </body>
+</html>
+

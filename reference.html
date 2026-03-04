@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference – KCG Ventures ERP Tutorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0f766e',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-slate-50">
+    <header class="site-nav">
+      <div class="site-nav-inner">
+        <div class="site-nav-title">KCG Ventures ERP Tutorial</div>
+        <nav class="site-nav-links">
+          <a href="index.html" class="site-nav-link">Introduction</a>
+          <a href="setup.html" class="site-nav-link">Setup</a>
+          <a href="build.html" class="site-nav-link">Build</a>
+          <a href="deploy.html" class="site-nav-link">Deploy</a>
+          <a href="reference.html" class="site-nav-link current">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="next-steps" class="page-section space-y-5">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Page 5 · Next steps &amp; troubleshooting
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+          Keep evolving your KCG Ventures ERP
+        </h1>
+        <p class="text-lg text-slate-700">
+          At this point you&apos;ve built, deployed, and used a real production planning and
+          inventory web app. This page is your long-term reference for improving the app and
+          handling common issues.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="change-workflow" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">1. How to make changes safely</h2>
+        <p>
+          Once your app is live, the basic change workflow looks like this:
+        </p>
+        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+          <li>Open your project in Cursor.</li>
+          <li>Make changes locally (usually by directing the AI, not by hand).</li>
+          <li>Run <code>npm run dev</code> and test at <code>http://localhost:3000</code>.</li>
+          <li>Commit the changes to Git.</li>
+          <li>Push the commit to GitHub.</li>
+          <li>Wait for Vercel to re-deploy the app.</li>
+        </ol>
+        <p>
+          You can repeat this loop as many times as you like. Each small improvement is one more
+          turn of the flywheel.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="feature-ideas" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">
+          2. Feature ideas tailored to KCG Ventures ERP
+        </h2>
+        <p>
+          Your current app captures the most important foundations. Here are realistic next steps
+          that fit your ERP vision and the bootcamp&apos;s scope.
+        </p>
+
+        <ul class="list-disc list-inside text-slate-700 space-y-2">
+          <li>
+            <span class="font-semibold">Multiple calibration profiles:</span> today you have one
+            profile. You could extend the data model to support different calibration profiles (for
+            different freeze dryers or future facilities) and allow selecting which one a batch
+            should use.
+          </li>
+          <li>
+            <span class="font-semibold">Batch-level inventory sufficiency:</span> for each batch,
+            define which inventory items are required and in what quantities, then run an inventory
+            sufficiency check and show shortages as part of the planner output.
+          </li>
+          <li>
+            <span class="font-semibold">Simple performance dashboard:</span> create a dashboard that
+            shows recent batches, average utilization of the freeze dryer, and trends in yield over
+            time.
+          </li>
+          <li>
+            <span class="font-semibold">Organization-level sharing:</span> instead of all data
+            being per-user, introduce an organization or facility entity so multiple team members
+            can log in and see the same calibration, inventory, and batches.
+          </li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-title">Example prompt for adding a feature</div>
+          <p class="mb-2">
+            To add “edit batch” functionality, you could tell Cursor something like:
+          </p>
+          <pre class="code-block-light"><code class="language-markdown">I want to allow users to edit existing batches in my KCG Ventures ERP app.
+
+Right now I have:
+- A `batches` entity in InstantDB with production_start_date, production_end_date, target_ingredient, target_dried_weight_g, status, and user links.
+- A `/planner` page that creates new batches.
+
+Please:
+1. Add an "Edit" button next to each batch in whatever list or table currently shows batches.
+2. When clicked, navigate to a new route like `/planner/[id]` that:
+   - Loads the selected batch.
+   - Shows a form pre-filled with the batch's existing values.
+   - Lets the user update the fields and save changes back to InstantDB.
+3. Keep all existing feasibility calculations in sync when the batch is updated.
+
+Update any necessary components and make sure TypeScript stays happy.</code></pre>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="troubleshooting" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">
+          3. Troubleshooting (click to expand each question)
+        </h2>
+
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>I see a blank page in the browser</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  A blank page usually means there&apos;s a JavaScript error that stopped the app
+                  from rendering.
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1">
+                  <li>
+                    Right-click in the page and choose
+                    <span class="font-semibold">Inspect</span>, then go to the
+                    <span class="font-semibold">Console</span> tab.
+                  </li>
+                  <li>Look for red error messages.</li>
+                  <li>Copy the main error message text.</li>
+                  <li>
+                    In Cursor, open the Composer and say:
+                    <span class="italic"
+                      >&quot;I&apos;m seeing a blank page and this error in the browser console.
+                      Please fix it.&quot;</span
+                    >
+                  </li>
+                  <li>Paste the error and let Cursor propose a fix.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>`npm run dev` shows an error</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  Development server errors are common when dependencies are missing or when a file
+                  has a typo.
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1 mb-2">
+                  <li>
+                    First, run:
+                    <code>npm install</code> in your project folder to ensure all packages are
+                    installed.
+                  </li>
+                  <li>Run <code>npm run dev</code> again.</li>
+                  <li>
+                    If the error persists, copy the relevant part of the error from the terminal.
+                  </li>
+                  <li>
+                    Ask Cursor:
+                    <span class="italic"
+                      >&quot;I&apos;m getting this error when running `npm run dev`. Please fix it
+                      for me.&quot;</span
+                    >
+                  </li>
+                </ul>
+                <p>
+                  Over time, you&apos;ll start to recognize common patterns (e.g. “module not
+                  found” means something wasn&apos;t imported or installed).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>My app works locally but not on Vercel</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  If <code>npm run dev</code> is fine but Vercel shows an error, it&apos;s usually a
+                  configuration issue.
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1">
+                  <li>
+                    In Vercel, open the latest deployment and read the
+                    <span class="font-semibold">build logs</span>.
+                  </li>
+                  <li>
+                    Make sure you&apos;ve set the
+                    <code>NEXT_PUBLIC_INSTANT_APP_ID</code> variable correctly in the project
+                    settings.
+                  </li>
+                  <li>
+                    Check that you pushed all of your latest code to GitHub before deploying.
+                  </li>
+                  <li>
+                    Copy the relevant error log and paste it into Cursor with a request to fix it.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>Login / Magic Code isn&apos;t working</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  If users can&apos;t log in, the issue is usually with configuration, email
+                  delivery, or permissions.
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1 mb-2">
+                  <li>
+                    Double-check that the InstantDB App ID in your environment variable matches the
+                    one in your InstantDB dashboard.
+                  </li>
+                  <li>Try logging in with a real, accessible email address.</li>
+                  <li>Check your spam or promotions folder for the Magic Code email.</li>
+                  <li>
+                    In the InstantDB dashboard, verify that email-based auth is enabled and
+                    configured according to their docs.
+                  </li>
+                </ul>
+                <p>
+                  If you still can&apos;t see the issue, copy any error messages and ask Cursor to
+                  audit your auth implementation against the InstantDB docs.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>My changes aren&apos;t showing up on the live site</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  If you edited code locally but don&apos;t see changes on the Vercel URL, check:
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1">
+                  <li>
+                    Did you <span class="font-semibold">commit and push</span> your changes to
+                    GitHub?
+                  </li>
+                  <li>
+                    Has Vercel finished the new deployment? It can take 1–3 minutes after each push.
+                  </li>
+                  <li>
+                    Try a <span class="font-semibold">hard refresh</span> in your browser:
+                    Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows).
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header">
+              <span>I want to start over from scratch</span>
+              <span class="accordion-icon">&gt;</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-content-inner">
+                <p class="mb-2">
+                  Sometimes the fastest way to move forward is to start clean, especially in the
+                  early stages of learning.
+                </p>
+                <ul class="list-disc list-inside text-slate-700 space-y-1">
+                  <li>In Vercel, you can delete the existing project.</li>
+                  <li>In GitHub, you can delete the repository.</li>
+                  <li>Create a new local folder and run through the build prompt again.</li>
+                </ul>
+                <p class="mt-1">
+                  This doesn&apos;t mean you failed – it&apos;s how many real software teams work
+                  when a prototype gets messy.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="learning-more" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">4. Where to go from here</h2>
+        <p>
+          If this project has sparked your curiosity, there are excellent resources where you can
+          dive deeper into each individual technology at your own pace.
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>
+            <span class="font-semibold">Next.js Docs:</span>
+            <a href="https://nextjs.org/docs" class="text-primary font-medium"
+              >https://nextjs.org/docs</a
+            >
+          </li>
+          <li>
+            <span class="font-semibold">InstantDB Docs:</span>
+            <a href="https://www.instantdb.com/docs" class="text-primary font-medium"
+              >https://www.instantdb.com/docs</a
+            >
+          </li>
+          <li>
+            <span class="font-semibold">Tailwind CSS Docs:</span>
+            <a href="https://tailwindcss.com/docs" class="text-primary font-medium"
+              >https://tailwindcss.com/docs</a
+            >
+          </li>
+          <li>
+            <span class="font-semibold">React Docs:</span>
+            <a href="https://react.dev" class="text-primary font-medium">https://react.dev</a>
+          </li>
+        </ul>
+        <p>
+          You don&apos;t have to become an expert in all of these to build useful tools. Even a
+          high-level understanding, combined with strong prompts and a clear product vision (which
+          you already have), can take you very far.
+        </p>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="scripts.js"></script>
+  </body>
+</html>
+

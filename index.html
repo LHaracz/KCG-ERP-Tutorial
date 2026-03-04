@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introduction – KCG Ventures ERP Tutorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0f766e',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-slate-50">
+    <header class="site-nav">
+      <div class="site-nav-inner">
+        <div class="site-nav-title">KCG Ventures ERP Tutorial</div>
+        <nav class="site-nav-links">
+          <a href="index.html" class="site-nav-link current">Introduction</a>
+          <a href="setup.html" class="site-nav-link">Setup</a>
+          <a href="build.html" class="site-nav-link">Build</a>
+          <a href="deploy.html" class="site-nav-link">Deploy</a>
+          <a href="reference.html" class="site-nav-link">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="welcome" class="page-section space-y-6">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Beginner-friendly, business-focused
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+          Build your own production planning &amp; inventory web app
+        </h1>
+        <p class="text-lg text-slate-700">
+          This tutorial will guide you, step by step, from
+          <span class="font-semibold">“I&apos;ve never written code before”</span> to having a
+          working
+          <span class="font-semibold">KCG Ventures ERP</span> web application live on the internet.
+          You will not be coding by hand – instead, you&apos;ll learn how to
+          <span class="font-semibold">direct an AI assistant</span> to build your app for you.
+        </p>
+
+        <div class="callout callout-strong">
+          <div class="callout-title">By the end of this tutorial, you will:</div>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>Have a real web app online that you can log into and use.</li>
+            <li>
+              Model key parts of your production workflow: freeze-dryer calibration, yield logging,
+              batch planning, and inventory.
+            </li>
+            <li>
+              Understand the big-picture concepts behind modern web apps so future projects feel
+              less mysterious.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="what-we-are-building" class="page-section space-y-4">
+        <div class="section-eyebrow">Page 1 · Introduction</div>
+        <h2 class="text-2xl font-semibold tracking-tight">What you&apos;re building</h2>
+        <p>
+          <span class="font-semibold">KCG Ventures ERP</span> is a focused production planning and
+          inventory management tool for a shared facility. Instead of wrestling with complex Google
+          Sheets, you&apos;ll have a structured app that:
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>
+            Stores a single, configurable
+            <span class="font-semibold">freeze-dryer calibration profile</span> (number of dryers,
+            trays, cycle times, operating hours, load per tray, etc.).
+          </li>
+          <li>
+            Logs <span class="font-semibold">yield data from individual trays</span> so you can see
+            rolling averages for fresh and dried output.
+          </li>
+          <li>
+            Lets you create <span class="font-semibold">production batches</span> based on a target
+            dried ingredient amount and tests their feasibility against your freeze-dryer capacity.
+          </li>
+          <li>
+            Maintains <span class="font-semibold">inventory ledgers</span> of ingredients and
+            materials using an append-only transaction model.
+          </li>
+        </ul>
+        <p>
+          The goal is not to perfectly replicate every spreadsheet you have today. The goal is to
+          build a <span class="font-semibold">real, working foundation</span> that captures your
+          most important workflows and can grow over time.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="web-app-concepts" class="page-section space-y-6">
+        <h2 class="text-2xl font-semibold tracking-tight">How modern web apps work</h2>
+        <p>
+          Before you build anything, it&apos;s worth building a solid mental model for
+          <span class="font-semibold">what a web app actually is</span>. This will make every future
+          project feel less like magic and more like a system you understand.
+        </p>
+
+        <div class="two-column">
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Websites vs. web apps</h3>
+            <p>
+              A <span class="font-semibold">website</span> is mostly
+              <span class="italic">static information</span> – for example, a restaurant menu or a
+              marketing page. Every visitor sees the same thing, and nothing is really “saved” per
+              user.
+            </p>
+            <p>
+              A <span class="font-semibold">web app</span> is
+              <span class="italic">interactive and personalized</span>. Users can log in, create
+              records, update data, and the app remembers who did what. Google Sheets, Notion, and
+              banking portals are all web apps.
+            </p>
+            <p>
+              Your KCG Ventures ERP is firmly in the <span class="font-semibold">web app</span>
+              category because each production manager needs to log in, plan their own batches, and
+              see their own data.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Why your app needs a backend</h3>
+            <p>
+              If your app only ran in the browser, any data would vanish the moment you closed the
+              tab. That might be okay for a calculator. It is
+              <span class="font-semibold">not okay</span> for calibration settings, inventory, or
+              batch history.
+            </p>
+            <p>
+              You need a <span class="font-semibold">central, persistent place</span> where data
+              lives – a “system of record” for your operation. That&apos;s the job of the backend
+              and database.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">Mental model: your app as a restaurant</div>
+          <p class="subtle mb-2">This analogy will show up throughout the tutorial.</p>
+          <p class="mb-2">
+            Imagine your production facility as a restaurant. The
+            <span class="font-semibold">dining room</span> is where customers sit, read the menu,
+            and place orders. The <span class="font-semibold">kitchen</span> is where food is
+            prepared, scheduled, and stored. Customers never go into the kitchen—they only interact
+            with what they can see and request.
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>
+              <span class="font-semibold">Frontend (client)</span> = the dining room interface. In
+              your app, this is the set of pages users see in their browser: navigation, forms
+              (e.g. “Create batch”), tables of inventory, etc.
+            </li>
+            <li>
+              <span class="font-semibold">Backend (server + database)</span> = the kitchen and
+              pantry. It stores calibration settings, yield logs, inventory ledgers, and batch
+              records. Users never see raw database tables, they just see results.
+            </li>
+            <li>
+              <span class="font-semibold">API</span> = the waiter carrying orders and plates.
+              Whenever the frontend needs something (“create a batch”, “update inventory”), it
+              sends a request to the backend through this API.
+            </li>
+          </ul>
+          <p class="mt-2">
+            In this tutorial, you&apos;ll use tools that give you a
+            <span class="font-semibold">ready-made kitchen and waitstaff</span>. You focus on the
+            “menu” and flows, not on building industrial equipment from scratch.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">How this maps to your ERP</h3>
+          <p>
+            Concretely, here&apos;s how the pieces will line up for KCG Ventures ERP:
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>
+              The <span class="font-semibold">frontend</span> (dining room) is built with
+              <span class="font-semibold">Next.js + React</span>. It renders pages like
+              “Calibration”, “Yield Logging”, “Batch Planner”, and “Inventory”.
+            </li>
+            <li>
+              The <span class="font-semibold">backend &amp; database</span> (kitchen) are provided
+              by <span class="font-semibold">InstantDB</span>. It stores your entities:
+              calibration settings, yield entries, batches, inventory items, transactions, and
+              finished goods.
+            </li>
+            <li>
+              You&apos;ll use <span class="font-semibold">user accounts</span> so each person logs
+              in and sees their own data. InstantDB&apos;s Magic Code login means no passwords to
+              manage.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="tools" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">The tools you&apos;ll use</h2>
+        <p>
+          You&apos;ll use a small, carefully chosen toolset that plays nicely together and is
+          friendly to beginners using AI assistance.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>What it does</th>
+                <th>Analogy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-semibold">Cursor</td>
+                <td>An AI-powered code editor where you describe what you want and it writes code.</td>
+                <td>Your <span class="italic">coding assistant</span> and project co-pilot.</td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Next.js</td>
+                <td>
+                  A framework (on top of React) for building modern web app frontends with routing
+                  and good defaults.
+                </td>
+                <td>
+                  The <span class="italic">architectural blueprint</span> for your dining room – how
+                  pages and components fit together.
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">InstantDB</td>
+                <td>
+                  A backend-as-a-service that stores your data, syncs it to the frontend, and
+                  handles user authentication.
+                </td>
+                <td>
+                  Your <span class="italic">kitchen and pantry</span>, already staffed and
+                  organized.
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Tailwind CSS</td>
+                <td>
+                  A styling system that lets the AI quickly create clean, responsive UI using small
+                  utility classes.
+                </td>
+                <td>
+                  A <span class="italic">design toolkit</span> of pre-cut materials for building a
+                  clean, professional-looking dining room.
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Vercel</td>
+                <td>
+                  A hosting platform that puts your Next.js app on the internet with free, automatic
+                  deployments.
+                </td>
+                <td>
+                  The <span class="italic">building</span> where your restaurant lives, with power,
+                  security, and an always-on kitchen.
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">GitHub</td>
+                <td>
+                  A place to store versions of your code and connect it to Vercel for deployment.
+                </td>
+                <td>
+                  A <span class="italic">filing cabinet</span> that keeps every version of your
+                  blueprints safe and shareable.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="subtle">
+          You don&apos;t need to memorize all of this. Think of this page as the
+          <span class="font-semibold">map</span>. In the next pages, we&apos;ll walk through each
+          step slowly and let the AI handle the heavy lifting.
+        </p>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="scripts.js"></script>
+  </body>
+</html>
+

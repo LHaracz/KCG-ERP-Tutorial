@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build – KCG Ventures ERP Tutorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0f766e',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-slate-50">
+    <header class="site-nav">
+      <div class="site-nav-inner">
+        <div class="site-nav-title">KCG Ventures ERP Tutorial</div>
+        <nav class="site-nav-links">
+          <a href="index.html" class="site-nav-link">Introduction</a>
+          <a href="setup.html" class="site-nav-link">Setup</a>
+          <a href="build.html" class="site-nav-link current">Build</a>
+          <a href="deploy.html" class="site-nav-link">Deploy</a>
+          <a href="reference.html" class="site-nav-link">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="build-overview" class="page-section space-y-5">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Page 3 · Building your app
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+          Ask the AI to build KCG Ventures ERP
+        </h1>
+        <p class="text-lg text-slate-700">
+          On this page you&apos;ll create a new project in Cursor and use a
+          <span class="font-semibold">carefully designed build prompt</span> to generate a working
+          Next.js + InstantDB version of your KCG Ventures ERP.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="project-folder" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">1. Create your project folder</h2>
+        <p>
+          First, you&apos;ll create an empty folder on your computer where all of the app&apos;s
+          files will live.
+        </p>
+        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+          <li>
+            Create a new folder on your computer. Name it something like
+            <code>kcg-ventures-erp</code> (no spaces – use dashes).
+          </li>
+          <li>Open Cursor.</li>
+          <li>
+            In Cursor, go to <span class="font-semibold">File → Open Folder</span> and select the
+            new folder you just created.
+          </li>
+          <li>
+            You should see the folder name appear in the sidebar. It will be empty for now – that&apos;s
+            expected.
+          </li>
+        </ol>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="build-prompt" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">2. Use the build prompt</h2>
+        <p>
+          Now you&apos;ll give Cursor a complete, detailed description of the app you want it to
+          build. The AI will create:
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>A Next.js project with the App Router and TypeScript.</li>
+          <li>An InstantDB schema and permissions files.</li>
+          <li>Pages and components that match your KCG Ventures ERP workflow.</li>
+        </ul>
+        <p>
+          You don&apos;t need to modify this prompt beyond
+          <span class="font-semibold">pasting your InstantDB App ID</span> into the two marked
+          places.
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">How to run this prompt in Cursor</div>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>In Cursor, open the project folder you just created.</li>
+            <li>
+              Open the <span class="font-semibold">Composer</span> (Cmd+I on Mac, Ctrl+I on
+              Windows).
+            </li>
+            <li>Copy the entire prompt below.</li>
+            <li>
+              Paste it into the Composer and
+              <span class="font-semibold">replace every occurrence of</span>
+              <code>YOUR_APP_ID_HERE</code> with your actual InstantDB App ID.
+            </li>
+            <li>Press Enter and let Cursor work. This may take a few minutes.</li>
+          </ol>
+        </div>
+
+        <h3 class="text-xl font-semibold mt-4">Copy-paste build prompt</h3>
+        <p class="subtle">
+          Don&apos;t type this by hand – copy it using the copy button in the top-right corner of
+          the code block.
+        </p>
+
+        <pre class="code-block"><code class="language-markdown">Build me a Next.js web application. Here are the complete specifications:
+
+## Tech Stack (DO NOT DEVIATE)
+- Next.js 14+ with App Router (not Pages Router)
+- TypeScript
+- Tailwind CSS for styling
+- InstantDB for database and authentication (use @instantdb/react)
+
+## InstantDB Configuration
+My InstantDB App ID is: YOUR_APP_ID_HERE
+
+Initialize InstantDB in a file at `src/lib/db.ts` like this:
+```typescript
+import { init } from '@instantdb/react';
+import schema from '../../instant.schema';
+
+const APP_ID = 'YOUR_APP_ID_HERE';
+
+export const db = init({
+  appId: APP_ID,
+  schema,
+});
+```
+
+## App Description
+Build an app called **KCG Ventures ERP**. It is a focused production planning and inventory management system for a shared production facility. The app replaces complex Google Sheets with a structured web application that models freeze-dryer capacity, yield logging, batch planning based on target dried ingredient amounts, and inventory ledgers with append-only transactions. All key operational variables are configurable through the UI (no hard-coded calibration assumptions).
+
+## Data Model
+Create an InstantDB schema in `instant.schema.ts` with these entities and fields:
+
+1. `calibration` (a single global calibration profile for now)
+- `id`: string (InstantDB id)
+- `number_of_freeze_dryers`: number
+- `trays_per_machine_per_cycle`: number
+- `cycle_time_hours`: number               // active freeze-drying time per cycle
+- `defrost_cleaning_hours`: number         // defrost / cleaning time per cycle
+- `operating_hours_per_day`: number
+- `operating_days_per_week`: number
+- `fresh_load_per_tray_g`: number          // grams of fresh material per tray
+- `dry_matter_fraction`: number            // fraction of dry matter in fresh material (0-1)
+- `owner_id`: string (user id reference, optional – used to scope per user)
+
+2. `yield_entries`
+- `id`: string
+- `microgreen_type`: string
+- `tray_harvest_date`: date
+- `fresh_harvested_weight_g`: number
+- `dried_output_weight_g`: number | null
+- `tray_identifier`: string | null
+- `created_at`: date
+
+3. `batches`
+- `id`: string
+- `production_start_date`: date
+- `production_end_date`: date
+- `target_ingredient`: string         // e.g. "broccoli powder"
+- `target_dried_weight_g`: number
+- `status`: string                    // e.g. "planned", "draft"
+- `created_at`: date
+
+4. `inventory_items`
+- `id`: string
+- `name`: string                      // e.g. "Broccoli floret", "Pouch 250g"
+- `unit`: string                      // e.g. "g", "kg", "units"
+- `quantity_on_hand`: number         // derived from transactions but kept for fast display
+- `created_at`: date
+
+5. `inventory_transactions`
+- `id`: string
+- `type`: string                      // "purchase", "consumption", "adjustment"
+- `quantity`: number
+- `reference`: string | null          // optional free-text note
+- `created_at`: date
+
+6. `finished_goods_batches`
+- `id`: string
+- `product_name`: string
+- `quantity_produced`: number
+- `date_produced`: date
+- `expiration_date`: date | null
+- `created_at`: date
+
+Relationships:
+- Link all user-owned entities to the built-in `$users` table:
+  - Each `calibration` has one `owner` (a `$users` record).
+  - Each `yield_entries` record belongs to one user.
+  - Each `batches` record belongs to one user.
+  - Each `inventory_items` record belongs to one user.
+  - Each `inventory_transactions` record belongs to one user and one `inventory_items` record.
+  - Each `finished_goods_batches` record belongs to one user.
+
+Model these relations using InstantDB links (for example using `links` with forward/reverse definitions).
+
+## Authentication
+Implement user authentication using InstantDB's Magic Code flow:
+1. User enters their email.
+2. InstantDB sends a 6-digit code to that email.
+3. User enters the code to log in.
+4. Use `db.useAuth()` to check login status.
+5. Protect all routes that read or write production data so only authenticated users can access them.
+
+When a user is not logged in:
+- Redirect them to the `/login` page when they try to access protected pages.
+- Show a simple, friendly message explaining that they need to log in to use the ERP.
+
+## Pages to Create
+Use the Next.js App Router. Create at least the following routes:
+
+1. `/` (Home / Dashboard)
+- If the user is not authenticated, show a welcome message and a clear call-to-action button to "Log in" that links to `/login`.
+- If the user is authenticated, show a simple dashboard with:
+  - A quick summary of their calibration status (e.g. whether a calibration record exists).
+  - Shortcuts (cards or buttons) linking to:
+    - Calibration
+    - Yield Logging
+    - Batch Planner
+    - Inventory
+    - Finished Goods
+
+2. `/login`
+- Implement the Magic Code login UX with:
+  - Step 1: email input where the user can request a code.
+  - Step 2: code input to verify and log in.
+- Show loading and error states.
+- Once logged in, redirect to `/`.
+
+3. `/calibration`
+- A page where the user can view and edit their single calibration profile.
+- If no calibration exists yet for this user, show an "empty state" with a button to create one using sensible defaults.
+- The form fields should match the `calibration` entity:
+  - number_of_freeze_dryers
+  - trays_per_machine_per_cycle
+  - cycle_time_hours
+  - defrost_cleaning_hours
+  - operating_hours_per_day
+  - operating_days_per_week
+  - fresh_load_per_tray_g
+  - dry_matter_fraction
+- On the same page, display derived read-only values calculated from the inputs:
+  - `hours_per_cycle = cycle_time_hours + defrost_cleaning_hours`
+  - `per_cycle_fresh_capacity = number_of_freeze_dryers * trays_per_machine_per_cycle * fresh_load_per_tray_g`
+  - Given a production window with `production_days`, you will later use:
+    - `total_available_hours = production_days * operating_hours_per_day`
+    - `max_cycles_available = floor(total_available_hours / hours_per_cycle)`
+- It's okay if `production_days` is not used directly here; just show the first two derived values based on the calibration inputs.
+
+4. `/yield`
+- A page for logging tray-level yield data and viewing recent history.
+- Features:
+  - A form to create a new `yield_entries` record with:
+    - microgreen_type
+    - tray_harvest_date
+    - fresh_harvested_weight_g
+    - dried_output_weight_g (optional)
+    - tray_identifier (optional)
+  - A table or list of recent entries (e.g. last 20), sorted by `tray_harvest_date` descending.
+  - Calculated rolling averages displayed at the top:
+    - Average fresh yield per tray (mean of `fresh_harvested_weight_g`).
+    - Average dried yield per tray (mean of `dried_output_weight_g` for entries where it is not null).
+
+5. `/planner`
+- A batch planner that starts from a target dried ingredient amount and tests freeze-dryer feasibility.
+- Inputs in a form:
+  - production_start_date
+  - production_end_date
+  - target_ingredient (string)
+  - target_dried_weight_g (number)
+- Use the calibration record and formulas below to calculate feasibility.
+
+### Freeze Dryer Feasibility Model (Important)
+
+Use these formulas exactly, based on the production idea document:
+
+1. Compute the inclusive number of production days:
+```ts
+const production_days = (endDate - startDate) + 1;
+```
+Where `startDate` and `endDate` are dates (you can compute this using JavaScript date math and dividing the difference in milliseconds by the length of a day). Days are inclusive, so if start and end are the same day, `production_days` should be 1.
+
+2. Derived from calibration:
+```ts
+const hours_per_cycle = cycle_time_hours + defrost_cleaning_hours;
+
+const per_cycle_fresh_capacity =
+  number_of_freeze_dryers *
+  trays_per_machine_per_cycle *
+  fresh_load_per_tray_g;
+
+const total_available_hours = production_days * operating_hours_per_day;
+
+const max_cycles_available = Math.floor(total_available_hours / hours_per_cycle);
+```
+
+3. Use yield assumptions to go from target dried to required fresh:
+- The `dry_matter_fraction` is the fraction of dry matter in the fresh load.
+- Given a target dried weight (`target_dried_weight_g`), approximate the fresh weight needed as:
+```ts
+const fresh_needed_g = target_dried_weight_g / dry_matter_fraction;
+```
+
+4. Convert fresh needed into required freeze-dryer cycles:
+```ts
+const cycles_needed = fresh_needed_g / per_cycle_fresh_capacity;
+```
+
+5. Feasibility condition:
+- The batch is feasible from a freeze-dryer perspective if:
+```ts
+const feasible = max_cycles_available >= Math.ceil(cycles_needed);
+```
+
+On the `/planner` page, display:
+- Trays required (you can approximate by `cycles_needed * trays_per_machine_per_cycle`, rounded up).
+- Cycles required (`Math.ceil(cycles_needed)`).
+- Total hours required (`Math.ceil(cycles_needed) * hours_per_cycle`).
+- Available cycles (`max_cycles_available`).
+- A clear status:
+  - If feasible: show a success message.
+  - If not feasible: show how many cycles, hours, or fresh capacity you are short by.
+
+6. Optional (if scope allows): inventory sufficiency check
+- For now, you can implement a simple check where the user manually enters the amount of a key inventory item required, and compare it to `quantity_on_hand` for that item:
+```ts
+const sufficient = required_quantity &lt;= quantity_on_hand;
+```
+- This can be presented on the planner page as a second “gate” after freeze-dryer capacity.
+
+6. `/inventory`
+- A page that acts as a simple inventory ledger.
+- Features:
+  - List all `inventory_items` with `name`, `unit`, and `quantity_on_hand`.
+  - A form to create new `inventory_items`.
+  - A section to record new `inventory_transactions`:
+    - Choose an `inventory_item`.
+    - Select `type` ("purchase", "consumption", "adjustment").
+    - Enter `quantity`.
+    - Optional `reference` note.
+  - When a transaction is created, also update the `quantity_on_hand` for that item in a consistent way:
+    - "purchase": add the quantity.
+    - "consumption": subtract the quantity.
+    - "adjustment": add the quantity (it can be negative for corrections).
+  - Show a history list of recent transactions, sorted by `created_at` descending.
+
+7. `/finished-goods`
+- A simple page to log finished goods batches.
+- Features:
+  - A form to create a `finished_goods_batches` record with:
+    - product_name
+    - quantity_produced
+    - date_produced
+    - expiration_date (optional, can be derived using simple rules if you want)
+  - A list or table of finished goods batches.
+
+All of the above pages (except `/login`) must be protected so only authenticated users can access them.
+
+## Core Features
+Please implement at least these core features:
+1. User authentication with InstantDB Magic Code flow.
+2. A calibration page where the user can create and edit a single calibration record and see derived metrics (hours per cycle, per-cycle fresh capacity).
+3. A yield logging page that lets the user record tray-level yields and shows rolling averages.
+4. A batch planner that:
+   - Starts from target dried weight and production window.
+   - Uses calibration and `dry_matter_fraction` to estimate fresh needed.
+   - Computes required cycles, available cycles, and feasibility.
+5. An inventory ledger with items and append-only transactions that update `quantity_on_hand`.
+6. A simple finished goods logging page.
+
+## UI Requirements
+- Use Tailwind CSS classes to create a clean, modern, and mobile-responsive UI.
+- Implement clear navigation between pages (a shared layout or navigation bar).
+- Show loading states while data is being fetched with `db.useQuery`.
+- Show error states or messages when operations fail.
+- Use simple, descriptive labels that match the business language for KCG Ventures (e.g. "Freeze Dryer Calibration", "Batch Planner", "Yield Logging").
+
+## File Structure
+Use this structure:
+```
+src/
+  app/
+    layout.tsx          # Root layout with providers (InstantDB provider, global nav)
+    page.tsx            # Home / dashboard page
+    login/
+      page.tsx          # Login page
+    calibration/
+      page.tsx          # Calibration page
+    yield/
+      page.tsx          # Yield logging page
+    planner/
+      page.tsx          # Batch planner page
+    inventory/
+      page.tsx          # Inventory ledger page
+    finished-goods/
+      page.tsx          # Finished goods page
+  components/
+    Navigation.tsx      # Shared navigation/header component
+    AuthGuard.tsx       # Component to protect authenticated routes
+    [other reusable components as needed]
+  lib/
+    db.ts               # InstantDB initialization
+
+instant.schema.ts       # InstantDB schema (matching the data model above)
+instant.perms.ts        # InstantDB permissions (so users can only see their own data)
+```
+
+## InstantDB Permissions
+In `instant.perms.ts`, configure permissions so that:
+- Users can only read and write records that belong to them (based on the links to `$users`).
+- Authentication and Magic Code login work as expected.
+- It is safe to use this app on the public internet without exposing other users' data.
+
+## Getting Started Steps (for the developer – Cursor)
+After you generate the code:
+1. Initialize the Next.js app in the current folder:
+```bash
+npx create-next-app@latest . --tailwind --eslint --app --src-dir --import-alias "@/*" --typescript
+```
+2. Install InstantDB:
+```bash
+npm install @instantdb/react
+```
+3. Create and fill in:
+   - `src/lib/db.ts` using the InstantDB initialization code above.
+   - `instant.schema.ts` and `instant.perms.ts` using the specified data model and permissions.
+4. Implement all pages and components listed above.
+5. Make sure the app runs locally with:
+```bash
+npm run dev
+```
+6. Ensure all TypeScript errors are resolved.
+
+Please create all necessary files with complete, working code that satisfies the specification above.</code></pre>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="what-to-expect" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">3. What to expect as Cursor builds</h2>
+        <p>
+          When you run the build prompt, Cursor will start generating files and folders in your
+          project. You&apos;ll see them appear in the sidebar in real time.
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>
+            It may take several minutes – especially when creating multiple pages and the
+            InstantDB schema.
+          </li>
+          <li>
+            Cursor may ask you follow-up questions (for example, to confirm options for
+            <code>create-next-app</code>). Answer them based on this tutorial.
+          </li>
+          <li>
+            Don&apos;t worry if you see warnings or even errors at first – you&apos;ll fix them
+            with the AI&apos;s help.
+          </li>
+        </ul>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="run-locally" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">4. Run your app locally</h2>
+        <p>
+          After Cursor finishes generating code, you&apos;re ready to see KCG Ventures ERP running
+          on your own machine.
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+          <li>In Cursor, open the integrated terminal (View → Terminal).</li>
+          <li>
+            Make sure the terminal is pointed at your project folder (it usually is, by default).
+          </li>
+          <li>Run the development server:</li>
+        </ol>
+
+        <pre class="code-block"><code class="language-bash">npm run dev</code></pre>
+
+        <p class="mt-2">
+          Wait until you see a line that includes something like
+          <code>http://localhost:3000</code>.
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">What is localhost:3000?</div>
+          <p>
+            <span class="font-semibold">localhost</span> is a special address that means “this
+            computer.” The <span class="font-semibold">:3000</span> part is like a specific
+            doorway, or port, where your app is listening for requests.
+          </p>
+          <p class="mt-1">
+            When you type <code>http://localhost:3000</code> into your browser, you&apos;re asking
+            your computer: “Show me the web app that is currently running on port 3000.”
+          </p>
+        </div>
+
+        <p class="mt-2">
+          Open your browser and go to <code>http://localhost:3000</code>. You should see the
+          homepage of your new KCG Ventures ERP app.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="fixing-issues" class="page-section space-y-4">
+        <h2 class="text-2xl font-semibold tracking-tight">5. Fix issues with the AI&apos;s help</h2>
+        <p>
+          It&apos;s common for the first version of a generated app to have a few rough edges:
+          TypeScript errors, missing imports, or other small issues. You don&apos;t need to debug
+          these manually.
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+          <li>
+            If the terminal shows an error, select the error message text and copy it.
+          </li>
+          <li>
+            If the browser shows an error screen, copy the error message from there instead.
+          </li>
+          <li>Open Cursor&apos;s Composer (Cmd+I / Ctrl+I).</li>
+          <li>
+            Paste the error and say something like:
+            <span class="italic"
+              >&quot;I&apos;m getting this error when I run `npm run dev`. Please fix it for me in
+              this project.&quot;</span
+            >
+          </li>
+          <li>
+            Let Cursor propose code changes. Review them briefly, then accept/apply the edits.
+          </li>
+          <li>Re-run <code>npm run dev</code> and check again.</li>
+        </ol>
+
+        <p>
+          This <span class="font-semibold">error → ask AI → apply fix</span> loop is normal. Over
+          time you&apos;ll understand more of what the AI is doing, but you can start using the app
+          long before you understand every line of code.
+        </p>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="scripts.js"></script>
+  </body>
+</html>
+

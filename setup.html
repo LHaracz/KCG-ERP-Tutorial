@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup – KCG Ventures ERP Tutorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0f766e',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-slate-50">
+    <header class="site-nav">
+      <div class="site-nav-inner">
+        <div class="site-nav-title">KCG Ventures ERP Tutorial</div>
+        <nav class="site-nav-links">
+          <a href="index.html" class="site-nav-link">Introduction</a>
+          <a href="setup.html" class="site-nav-link current">Setup</a>
+          <a href="build.html" class="site-nav-link">Build</a>
+          <a href="deploy.html" class="site-nav-link">Deploy</a>
+          <a href="reference.html" class="site-nav-link">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="overview" class="page-section space-y-5">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Page 2 · Prerequisites &amp; Setup
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+          Set up your accounts and tools
+        </h1>
+        <p class="text-lg text-slate-700">
+          On this page you&apos;ll create the few accounts your app needs, install the tools on your
+          computer, and prepare InstantDB so your KCG Ventures ERP can store real production data.
+        </p>
+        <p class="subtle">
+          You&apos;ll only do this once per computer. After that, you&apos;ll reuse this setup for
+          other apps too.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="accounts" class="page-section space-y-5">
+        <h2 class="text-2xl font-semibold tracking-tight">Create your online accounts</h2>
+
+        <div class="space-y-4">
+          <h3 class="text-xl font-semibold">1. GitHub – where your code lives</h3>
+          <p>
+            <span class="font-semibold">What GitHub is:</span> a website where developers store and
+            share code. Think of it as a <span class="italic">cloud-based filing cabinet</span> for
+            your projects.
+          </p>
+          <p>
+            <span class="font-semibold">Why you need it:</span> your KCG Ventures ERP code will live
+            in a GitHub repository. Vercel connects to that repository to deploy your app to the
+            internet.
+          </p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>Go to <a href="https://github.com" class="text-primary font-medium">github.com</a>.</li>
+            <li>Click <span class="font-semibold">Sign up</span> and create an account.</li>
+            <li>Verify your email address when prompted.</li>
+            <li>
+              Choose a <span class="font-semibold">professional username</span> – it will appear in
+              your public URLs (for example: <code>https://github.com/your-username</code>).
+            </li>
+          </ol>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-xl font-semibold">2. Vercel – where your app will run</h3>
+          <p>
+            <span class="font-semibold">What Vercel is:</span> a hosting service that takes your
+            Next.js code and makes it available as a live website.
+          </p>
+          <p>
+            <span class="font-semibold">Why you need it:</span> right now your app will run only on
+            your laptop. Vercel runs it on servers so you, and others, can access it from anywhere.
+          </p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>Go to <a href="https://vercel.com" class="text-primary font-medium">vercel.com</a>.</li>
+            <li>Click <span class="font-semibold">Sign Up</span>.</li>
+            <li>
+              Choose <span class="font-semibold">Continue with GitHub</span> so Vercel can connect
+              to your repositories.
+            </li>
+            <li>Authorize Vercel when GitHub asks for permission.</li>
+            <li>
+              The free <span class="font-semibold">Hobby</span> plan is enough for this project and
+              many future ones.
+            </li>
+          </ol>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-xl font-semibold">3. InstantDB – your backend &amp; database</h3>
+          <p>
+            <span class="font-semibold">What InstantDB is:</span> a backend service that stores your
+            data and syncs it to the frontend in real time. It also provides user authentication.
+          </p>
+          <p>
+            <span class="font-semibold">Why you need it:</span> your ERP needs a safe, central place
+            to store calibration settings, yield logs, production batches, inventory transactions,
+            and finished goods.
+          </p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>Go to <a href="https://www.instantdb.com" class="text-primary font-medium">instantdb.com</a>.</li>
+            <li>Click <span class="font-semibold">Sign up</span> and create an account.</li>
+            <li>Verify your email address.</li>
+            <li>Sign in to reach the InstantDB dashboard.</li>
+          </ol>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="instantdb-app" class="page-section space-y-5">
+        <h2 class="text-2xl font-semibold tracking-tight">Create your InstantDB app</h2>
+        <p>
+          Now you&apos;ll create a dedicated InstantDB “app” that will hold all of your KCG Ventures
+          ERP data.
+        </p>
+
+        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+          <li>
+            In your browser, go to
+            <a href="https://www.instantdb.com/dash" class="text-primary font-medium"
+              >https://www.instantdb.com/dash</a
+            >.
+          </li>
+          <li>Click <span class="font-semibold">Create App</span>.</li>
+          <li>
+            Give it a name like
+            <span class="font-semibold">KCG Ventures ERP</span> or
+            <span class="font-semibold">kcg-erp</span>.
+          </li>
+          <li>Click to create the app.</li>
+          <li>
+            You&apos;ll see an <span class="font-semibold">App ID</span> – a long string of letters
+            and numbers, for example:
+            <code>566ffee5-e773-4b68-a132-29678f8f6eea</code>.
+          </li>
+        </ol>
+
+        <div class="callout">
+          <div class="callout-title">What is the InstantDB App ID?</div>
+          <p class="mb-2">
+            Think of the App ID as the <span class="font-semibold">mailing address</span> for your
+            database. When your Next.js frontend wants to read or write data (for example, “create
+            a new batch” or “update inventory”), it needs to know which InstantDB app it should
+            talk to.
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>
+              The App ID is <span class="font-semibold">not a password</span>. It&apos;s safe to
+              include in your frontend code.
+            </li>
+            <li>
+              InstantDB uses a <span class="font-semibold">permissions system</span> to decide who
+              can read and write which data.
+            </li>
+            <li>
+              You&apos;ll use this App ID in your build prompt so the generated app connects to the
+              correct database.
+            </li>
+          </ul>
+        </div>
+
+        <p class="mt-2">
+          <span class="font-semibold">Action:</span> copy your App ID into a safe place (notes app,
+          text file). You&apos;ll paste it into the build prompt on the next page.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="node-and-terminal" class="page-section space-y-5">
+        <h2 class="text-2xl font-semibold tracking-tight">Install Node.js and meet the terminal</h2>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">What is Node.js?</h3>
+          <p>
+            Web apps are written in JavaScript. In production, most of that JavaScript runs in your
+            users&apos; browsers. But <span class="font-semibold">during development</span>, you
+            need to run tools on your own computer:
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1">
+            <li>Starting the development server that shows your app at <code>localhost:3000</code>.</li>
+            <li>Installing packages like Next.js and InstantDB.</li>
+            <li>Building your app for deployment.</li>
+          </ul>
+          <p>
+            Node.js is the <span class="font-semibold">JavaScript engine</span> that makes this
+            possible. It lets your computer understand and run JavaScript outside the browser.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">Install Node.js</h3>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>
+              Go to
+              <a href="https://nodejs.org" class="text-primary font-medium">https://nodejs.org</a>.
+            </li>
+            <li>
+              Download the <span class="font-semibold">LTS</span> (Long Term Support) version. It is
+              the stable, recommended option.
+            </li>
+            <li>Run the installer and follow the prompts.</li>
+            <li>
+              When it finishes, you can verify the installation in your
+              <span class="font-semibold">terminal</span>.
+            </li>
+          </ol>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">What is the terminal?</div>
+          <p class="mb-2">
+            The terminal (also called the <span class="font-semibold">command line</span>) is a
+            text-based way to give instructions to your computer. Instead of clicking icons, you
+            type short commands.
+          </p>
+          <ul class="list-disc list-inside text-slate-700 space-y-1 mb-2">
+            <li>On <span class="font-semibold">macOS</span>: open the <span class="italic">Terminal</span> app.</li>
+            <li>
+              On <span class="font-semibold">Windows</span>: open
+              <span class="italic">PowerShell</span> or
+              <span class="italic">Command Prompt</span>.
+            </li>
+          </ul>
+          <p class="mb-2">
+            It can look intimidating at first, but in this tutorial you&apos;ll use only a few, very
+            specific commands – and you can always ask the AI to explain what they do.
+          </p>
+          <p>
+            To confirm Node.js is installed, type this into your terminal and press Enter:
+          </p>
+        </div>
+
+        <pre class="code-block-light mt-3"><code class="language-bash">node --version</code></pre>
+
+        <p class="mt-3">
+          If you see a version number (like <code>v20.x.x</code>), you&apos;re good to go.
+        </p>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section id="cursor-setup" class="page-section space-y-5">
+        <h2 class="text-2xl font-semibold tracking-tight">Install and configure Cursor</h2>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">What Cursor is and why we&apos;re using it</h3>
+          <p>
+            Cursor is a <span class="font-semibold">code editor with a built-in AI assistant</span>.
+            Instead of you writing JavaScript or TypeScript by hand, you&apos;ll
+            <span class="font-semibold">describe what you want in plain English</span> and let
+            Cursor generate the code.
+          </p>
+          <p>
+            You are not trying to become a professional software engineer overnight. You&apos;re
+            learning to <span class="font-semibold">direct software projects</span> using AI – a
+            very valuable skill for a business founder or operator.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">Install Cursor</h3>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li>
+              Go to
+              <a href="https://cursor.com" class="text-primary font-medium">https://cursor.com</a>.
+            </li>
+            <li>Download Cursor for your operating system.</li>
+            <li>Run the installer and open Cursor.</li>
+            <li>Sign in or create a Cursor account when prompted.</li>
+          </ol>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">Give Cursor InstantDB as a “cheat sheet”</h3>
+          <p>
+            Cursor&apos;s AI has seen a lot of JavaScript and React, but
+            <span class="font-semibold">InstantDB is relatively new</span>. To help the AI generate
+            correct code, you can plug InstantDB&apos;s official documentation directly into Cursor.
+          </p>
+          <p>
+            Think of this as handing your AI assistant a
+            <span class="font-semibold">reference manual</span> for your backend so it doesn&apos;t
+            have to guess.
+          </p>
+
+          <div class="callout">
+            <div class="callout-title">When to add docs to Cursor</div>
+            <ul class="list-disc list-inside text-slate-700 space-y-1 mb-2">
+              <li>
+                <span class="font-semibold">Do add</span> docs for newer tools like InstantDB, or
+                when you see the AI guessing incorrectly.
+              </li>
+              <li>
+                <span class="font-semibold">Don&apos;t worry about</span> adding docs for very
+                standard tools (basic JavaScript, HTML, CSS) – the AI already knows those well.
+              </li>
+            </ul>
+            <p class="mb-1 font-semibold">Steps to add InstantDB docs in Cursor:</p>
+            <ol class="list-decimal list-inside space-y-1 text-slate-700">
+              <li>Open Cursor.</li>
+              <li>Open <span class="font-semibold">Settings</span> (Cmd+, on Mac, Ctrl+, on Windows).</li>
+              <li>Go to <span class="font-semibold">Features → Docs</span>.</li>
+              <li>Click <span class="font-semibold">Add Doc</span>.</li>
+              <li>
+                Paste this URL:
+                <code>https://www.instantdb.com/docs</code>
+              </li>
+              <li>Wait for Cursor to finish indexing (this can take a minute).</li>
+            </ol>
+          </div>
+
+          <p class="mt-2">
+            After this, when you ask Cursor to write code that uses InstantDB, it can
+            <span class="font-semibold">look things up</span> just like you would.
+          </p>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <section class="page-section space-y-3">
+        <h2 class="text-2xl font-semibold tracking-tight">You&apos;re ready to build</h2>
+        <p>
+          At this point you have:
+        </p>
+        <ul class="list-disc list-inside text-slate-700 space-y-1">
+          <li>A GitHub account for storing your code.</li>
+          <li>A Vercel account for hosting your live app.</li>
+          <li>An InstantDB account and App ID for your ERP&apos;s data.</li>
+          <li>Node.js installed and working.</li>
+          <li>Cursor installed and configured with InstantDB docs.</li>
+        </ul>
+        <p>
+          On the next page, you&apos;ll use a carefully designed
+          <span class="font-semibold">build prompt</span> to ask Cursor to generate your entire app
+          in one go.
+        </p>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="scripts.js"></script>
+  </body>
+</html>
+
